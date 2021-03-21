@@ -1,0 +1,35 @@
+{% extends "webmonit/base.html" %}
+
+
+{% block title %}Logs{% endblock %}
+{% block main %}
+<div class="row">
+    <div class="col-lg-8 col-lg-offset-2">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Logs</h3>
+            </div>
+            <table class="styled-table">
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Status</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in Logs reversed%}
+                    <tr>
+                        <td>{{ log.check_time}}</td>
+                        <td>{{ log.status}}</td>
+                        <td>{{ log.description}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

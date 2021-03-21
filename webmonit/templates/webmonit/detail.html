@@ -1,0 +1,23 @@
+{% extends "webmonit/base.html" %}
+
+
+{% block title %}Details{% endblock %}
+{% block main %}
+<div class="row">
+    <div class="col-lg-8 col-lg-offset-2">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Page details</h3>
+            </div>
+            <ul class="list-group">
+                <li class="list-group-item">
+                    <strong>{{ page.name}}</strong>
+                </li>
+                <li class="list-group-item">{{ page.url}}</li>
+                <li class="list-group-item">{{ page.status}}</li>
+            </ul>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
