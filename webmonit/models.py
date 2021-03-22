@@ -7,11 +7,14 @@ from requests.exceptions import HTTPError
 from django.utils import timezone
 import datetime
 
+
 class Page(models.Model):
     name = models.TextField(max_length=50)
     url = models.TextField()
     status = models.IntegerField(default=0)
     frequency = models.IntegerField(default=60)
+    monit_content = models.BooleanField(default=False)
+    monit_instance = models.BooleanField(default=False)
     content = models.JSONField
     task = models.OneToOneField(
         PeriodicTask,
@@ -47,28 +50,56 @@ class Page(models.Model):
             content = response.text
             description = response.reason
         except HTTPError as http_err:
-            description = (f'HTTP error occurred: {http_err}')
+            description = f'HTTP error occurred: {http_err}'
             status = 999
             content = self.content
         except Exception as err:
-            description = (f'HTTP error occurred: {err}')
+            description = f'HTTP error occurred: {err}'
             status = 999
             content = self.content
 
-        if self.status != status:
+        if self.monit_content:
+            content_changes, message = self.is_content_changed(content)
+        else:
+            content_changes = False
+            message = ""
+
+        if self.status != status or content_changes:
             p = PageLog(
                 page=self,
+                status_change=False,
                 status=status,
-                status_changes=True,
-                description=description
+                content_changes=content_changes,
+                description=description + message
             )
+
             p.save()
 
         self.content = content
         self.status = status
         self.save()
-
         return status
+
+    def is_changed(self, name, url, frequency):
+        """Check if name url frequency of the Page was changed"""
+        message = ""
+        if self.name != name:
+            message += f"name was changed from {self.name} to {name} /n"
+        if self.url != url:
+            message += f"name was changed from {self.name} to {name} /n"
+        if self.frequency != frequency:
+            message += f"name was changed from {self.name} to {name} /n"
+        return message != "", message
+
+    def is_content_changed(self, content):
+        """Check if page content was changed"""
+        message = ""
+        if self.content != content:
+            message += "Page content was changed"
+        return message != "", message
+
+    def check_page(self):
+        """Check availability,  """
 
 
 class PageLog(models.Model):

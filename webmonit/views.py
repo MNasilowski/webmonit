@@ -45,10 +45,14 @@ def create(request):
 
 def edit(request, page_id):
     page = get_object_or_404(Page, pk=page_id)
+    monit_instance = page.monit_instance
+    monit_content = page.monit_content
     if request.method == 'POST':
         form = CreatePageForm(request.POST, instance=page)
         if form.is_valid():
-            post = form.save()
+            post = form.instance
+            post.monit_instance = monit_instance
+            post.monit_content = monit_content
             post.save()
             return HttpResponseRedirect("/webmonit/")
     else:
