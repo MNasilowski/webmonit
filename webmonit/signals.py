@@ -10,20 +10,26 @@ def create_or_update_periodic_task(sender, instance, created, update_fields, **k
         instance.setup_task()
     else:
         if instance.task is not None:
-            if instance.frequency != instance.task.interval.every:
-                t, _ = IntervalSchedule.objects.get_or_create(every=instance.frequency, period='minutes')
-                if instance.monit_instance:
-                    p = PageLog(
-                        description=f"Post save Monit frequency was changed from {instance.task.interval.every} to {instance.frequency}",
-                        page=instance,
-                        status=instance.status,
-                        page_changes = True,
-                    )
-                    p.save()
-                instance.task.enabled = True
-                instance.task.interval = t
-                instance.task.save()
+            pass
 
-#@receiver(pre_save, sender=Page)
-#def create_instance_change_log(sender, instance, create, **kwargs):
-#    pass
+@receiver(pre_save, sender=Page)
+def create_instance_change_log(sender, instance, **kwargs):
+    if instance.id is None:
+        pass
+    else:
+        previous = Page.objects.get(id=instance.id)
+        inst_changed, message = previous.is_instance_changed(instance.name, instance.url, instance.frequency)
+        t, _ = IntervalSchedule.objects.get_or_create(every=instance.frequency, period='minutes')
+        if instance.monit_instance and inst_changed:
+            p = PageLog(
+                description=message,
+                page=instance,
+                status=instance.status,
+                page_changes=inst_changed,
+            )
+            p.save()
+        if instance.frequency != previous.frequency:
+            t, _ = IntervalSchedule.objects.get_or_create(every=instance.frequency, period='minutes')
+            instance.task.enabled = True
+            instance.task.interval = t
+            instance.task.save()

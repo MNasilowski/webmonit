@@ -28,6 +28,7 @@ class Page(models.Model):
         self.task = PeriodicTask.objects.create(
             name=self.name,
             task='check_page',
+            enabled=True,
             interval=t,
             args=json.dumps([self.id]),
             start_time=timezone.now()
@@ -50,45 +51,28 @@ class Page(models.Model):
             content = response.text
             description = response.reason
         except HTTPError as http_err:
+            status = 999
+            content = self.content
             description = f'HTTP error occurred: {http_err}'
-            status = 999
-            content = self.content
         except Exception as err:
-            description = f'HTTP error occurred: {err}'
             status = 999
             content = self.content
+            description = f'HTTP error occurred: {err}'
+        return status, content, description
 
-        if self.monit_content:
-            content_changes, message = self.is_content_changed(content)
-        else:
-            content_changes = False
-            message = ""
-
-        if self.status != status or content_changes:
-            p = PageLog(
-                page=self,
-                status_change=False,
-                status=status,
-                content_changes=content_changes,
-                description=description + message
-            )
-
-            p.save()
-
-        self.content = content
-        self.status = status
-        self.save()
-        return status
-
-    def is_changed(self, name, url, frequency):
+    def is_instance_changed(self, name, url, frequency):
         """Check if name url frequency of the Page was changed"""
         message = ""
         if self.name != name:
-            message += f"name was changed from {self.name} to {name} /n"
+            message += f"name was changed from {self.name} to {name} \n"
         if self.url != url:
-            message += f"name was changed from {self.name} to {name} /n"
+            message += f"name was changed from {self.name} to {name} \n"
         if self.frequency != frequency:
-            message += f"name was changed from {self.name} to {name} /n"
+            message += f"name was changed from {self.name} to {name}"
+            t, _ = IntervalSchedule.objects.get_or_create(every=self.frequency, period='minutes')
+            self.task.enabled = True
+            self.task.interval = t
+            self.task.save()
         return message != "", message
 
     def is_content_changed(self, content):
@@ -99,7 +83,25 @@ class Page(models.Model):
         return message != "", message
 
     def check_page(self):
-        """Check availability,  """
+        stat, cont, desc = self.is_available()
+        if self.monit_content:
+            cont_changed, cont_message = self.is_content_changed(self, cont)
+        else:
+            cont_changed, cont_message = False, ""
+
+        if self.status != stat or cont_changed:
+            p = PageLog(
+                page=self,
+                status_change=False,
+                status=stat,
+                content_changes=cont_changed,
+                description=desc + cont_message
+            )
+            p.save()
+            self.content = cont
+            self.status = stat
+            self.save()
+        return stat
 
 
 class PageLog(models.Model):
