@@ -20,6 +20,7 @@ def create_instance_change_log(sender, instance, **kwargs):
         previous = Page.objects.get(id=instance.id)
         inst_changed, message = previous.is_instance_changed(instance.name, instance.url, instance.frequency)
         t, _ = IntervalSchedule.objects.get_or_create(every=instance.frequency, period='minutes')
+        a, b ,c = instance.is_available()
         if instance.monit_instance and inst_changed:
             p = PageLog(
                 description=message,

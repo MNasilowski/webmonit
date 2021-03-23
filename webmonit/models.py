@@ -49,7 +49,7 @@ class Page(models.Model):
             response = requests.get(self.url)
             status = response.status_code
             content = response.text
-            description = response.reason
+            description = response.reason + "\n"
         except HTTPError as http_err:
             status = 999
             content = self.content
@@ -66,9 +66,9 @@ class Page(models.Model):
         if self.name != name:
             message += f"name was changed from {self.name} to {name} \n"
         if self.url != url:
-            message += f"name was changed from {self.name} to {name} \n"
+            message += f"url was changed from {self.url} to {url} \n"
         if self.frequency != frequency:
-            message += f"name was changed from {self.name} to {name}"
+            message += f"message was changed from {self.frequency} to {frequency}"
             t, _ = IntervalSchedule.objects.get_or_create(every=self.frequency, period='minutes')
             self.task.enabled = True
             self.task.interval = t
@@ -85,14 +85,14 @@ class Page(models.Model):
     def check_page(self):
         stat, cont, desc = self.is_available()
         if self.monit_content:
-            cont_changed, cont_message = self.is_content_changed(self, cont)
+            cont_changed, cont_message = self.is_content_changed(cont)
         else:
             cont_changed, cont_message = False, ""
 
         if self.status != stat or cont_changed:
             p = PageLog(
                 page=self,
-                status_change=False,
+                status_changes=self.status != stat,
                 status=stat,
                 content_changes=cont_changed,
                 description=desc + cont_message
