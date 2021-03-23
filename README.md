@@ -52,11 +52,8 @@ ___________
 
 
 ## TODO:
-* wykrywanie modyfikacji monitorowanego endpointu,
-* możliwość wykorzystania admina do zarządzania danymi które aplikacja zbiera,
-* posprzątanie aplikacji,
 * testy,
 * przygotowanie pakietu z aplikacją.
 * uruchamianie celery wraz z odpaleniem serwera
-
+* wykorzystanie django-rest-frameworka w formie jakiegoś 1 może 2 endpointów 
 
