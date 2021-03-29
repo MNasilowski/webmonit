@@ -68,7 +68,7 @@ class Page(models.Model):
         if self.url != url:
             message += f"url was changed from {self.url} to {url} \n"
         if self.frequency != frequency:
-            message += f"message was changed from {self.frequency} to {frequency}"
+            message += f"frequency was changed from {self.frequency} to {frequency}"
             t, _ = IntervalSchedule.objects.get_or_create(every=self.frequency, period='minutes')
             self.task.enabled = True
             self.task.interval = t

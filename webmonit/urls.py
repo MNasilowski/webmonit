@@ -11,4 +11,10 @@ urlpatterns = [
     path('create/', views.create, name='create'),
     path('<int:page_id>/edit/', views.edit, name='edit'),
     path('<int:page_id>/delete/', views.delete, name='delete'),
+
+    path('page-list/', views.pageList, name="task-list"),
+    path('page-detail/<str:pk>/', views.pageDetail, name="task-detail"),
+    path('page-create/', views.pageCreate, name="task-create"),
+    path('page-update/<str:pk>/', views.pageUpdate, name="task-update"),
+    path('page-delete/<str:pk>/', views.pageDelete, name="task-delete"),
 ]

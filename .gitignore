@@ -1,1 +1,5 @@
 webmonit/__pycache__
+webmonit/enums.py
+webmonit/migrations
+mysite/__pycache__
+
