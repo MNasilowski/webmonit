@@ -4,10 +4,21 @@ Prosta aplikacja do automatycznego monitorowania stron internetowych
 ## Aplikacja
 * ma możliwość zdefiniowania, edycji, usunięcia monitorowanej strony internetowej,
 * ma możliwość ustawienia interwału czasowego dla każdej monitorowanej strony który będzie odpowiadał za częstotliwość zapytań sprawdzających działanie,
-* wykrywa błędy w działaniu strony poprzez zapisywanie jej kodu odpowiedzi,
+* wykrywa błędy w działaniu strony poprzez zapisywanie jej kodu odpowiedzi wraz z krótkim opisem,
 * zapisuje zmiany w kodzie odpowiedzi dzięki czemu można stwierdzić kiedy problem miał miejsce i kiedy się zakończył,
+* opcjonalnie może zapisywać czy zawartość strony się zmieniła i czy zmieniła się definicja strony (aktywacja z panelu administratora),
 * wyświetla historię/log strony zawierający zmiany w kodzie odpowiedzi oraz zmiany w częstotliwości obserwacji strony,
-* posiada specjalny widok wyświetlający strony z którymi jest aktualnie problem.
+* posiada specjalny widok wyświetlający strony z którymi jest aktualnie problem,
+* Rest endpointy do dodawania, wyświetlania, edytowania,usuwania monitorowanych stron.
+
+## Endpointy
+* webmonit/page-list/
+* webmonit/page-detail/pk/
+* webmonit/page-create/
+* webmonit/page-update/pk/
+* webmonit/page-delete/pk/
+gdzie pk oznacza klucz główny danej strony.
+
 
 ## Wykorzystywane biblioteki
 * django,
@@ -53,7 +64,6 @@ ___________
 
 ## TODO:
 * testy,
-* przygotowanie pakietu z aplikacją.
-* uruchamianie celery wraz z odpaleniem serwera
-* wykorzystanie django-rest-frameworka w formie jakiegoś 1 może 2 endpointów 
-
+* przygotowanie pakietu z aplikacją,
+* zapewnienie ochrony przed niepożądanym działaniem aplikacji/urzytkownika,
+* uruchamianie celery wraz z odpaleniem serwera.
