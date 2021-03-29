@@ -8,6 +8,7 @@ from .models import Page, PageLog
 def create_or_update_periodic_task(sender, instance, created, update_fields, **kwargs):
     if created:
         instance.setup_task()
+	instance.check_page()
     else:
         if instance.task is not None:
             pass
